@@ -40,9 +40,7 @@ Vec3f scene::rayTrace(Vec3f eye, Vec3f dir, int recurseDepth)
 	{
 		//if there is a texture image, ask the object for the image coordinates (between 0 and 1)
 		Vec3f coords = myObjGroup->getClosest()->getTextureCoords(eye, dir * dist);
-		if (coords[0] > 1.0f || coords[1] > 1.0f) {
-			cout << coords << endl;
-		}
+
 		//get the color from that image location
 		textureColor.Set(
 			PIC_PIXEL(myMaterials.at(matIndex).texture,(int)(myMaterials.at(matIndex).texture->nx*coords.x()),(int)(myMaterials.at(matIndex).texture->ny*coords.y()),0),
@@ -56,8 +54,10 @@ Vec3f scene::rayTrace(Vec3f eye, Vec3f dir, int recurseDepth)
 	//Vec3f ambientColor = Vec3f(0.5, 0.5, 0.5);
 	answer += multiplyColorVectors(ambientColor, ambLight);
 
-	//iterate through all lights
+	// set point slightly above the actual surface, prevents
+	// issues with that point intersecting itself
 	Vec3f point = eye + (dir * dist) + (normal * .0001);
+	// iterate through lights
 	for (int iter = 0; iter < myLights.size(); iter++) {
 
 		Vec3f lightPos = myLights.at(iter).position;
