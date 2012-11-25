@@ -22,6 +22,16 @@ Lights {
 
 Materials {
 	Material {
+		textureFilename waterlilies.jpg
+		diffuseColor 1.0 1.0 1.0  
+		specularColor 0.9 0.9 0.9 
+		reflectiveColor 0.5 0.5 0.5
+		shininess 50
+		transparentColor 0 0 0 
+		indexOfRefraction 0.6
+	}
+	
+		Material {
 		textureFilename check1024.jpg
 		diffuseColor 1.0 1.0 1.0  
 		specularColor 0.9 0.9 0.9 
@@ -45,6 +55,6 @@ Group {
 		tex_xy_0 1 0
 		tex_xy_1 0 0
 		tex_xy_2 0 1
-		materialIndex 0
+		materialIndex 1
 	}
 }
