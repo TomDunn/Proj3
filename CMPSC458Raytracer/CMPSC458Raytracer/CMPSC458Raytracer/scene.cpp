@@ -49,14 +49,16 @@ Vec3f scene::rayTrace(Vec3f eye, Vec3f dir, int recurseDepth)
 		textureColor = textureColor*(1/255.0);
 	}
 
-	//add diffuse color times ambient light to our answer
-	Vec3f ambientColor = myMaterials.at(matIndex).diffuseCol;
-	//Vec3f ambientColor = Vec3f(0.5, 0.5, 0.5);
-	answer += multiplyColorVectors(ambientColor, ambLight);
+	// add ambient light/color to our answer
+	answer += ambLight * (myMaterials.at(matIndex).shininess / 100.0f);
 
 	// set point slightly above the actual surface, prevents
 	// issues with that point intersecting itself
 	Vec3f point = eye + (dir * dist) + (normal * .0001);
+
+	// get the diffuse color of our material
+	Vec3f diffuseColor = myMaterials.at(matIndex).diffuseCol;
+
 	// iterate through lights
 	for (int iter = 0; iter < myLights.size(); iter++) {
 
@@ -68,7 +70,7 @@ Vec3f scene::rayTrace(Vec3f eye, Vec3f dir, int recurseDepth)
 
 		// if nothing between point and light
 		if (distance == 9999999 || distance < 0.00005f) {
-			Vec3f color = multiplyColorVectors(ambientColor, myLights.at(iter).color);
+			Vec3f color = multiplyColorVectors(diffuseColor, myLights.at(iter).color);
 			float nl    = direction.Dot3(normal);
 
 			if (nl < 0.0) {
