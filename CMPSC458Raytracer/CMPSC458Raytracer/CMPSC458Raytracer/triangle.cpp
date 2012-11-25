@@ -34,6 +34,7 @@ float triangle::testIntersection(Vec3f eye, Vec3f dir)
 			k = A[1] - eye[1],
 			l = A[2] - eye[2];
 
+	// cramers rule
 	float M = a*(e*i - h*f) + b*(g*f - d*i) + c*(d*h - e*g);
 	float beta =
 		(j*(e*i - h*f) + k*(g*f - d*i) + l*(d*h - e*g)) / M;
@@ -41,6 +42,7 @@ float triangle::testIntersection(Vec3f eye, Vec3f dir)
 		(i*(a*k - j*b) + h*(j*c - a*l) + g*(b*l - k*c))/M;
 	float t = -(f*(a*k - j*b) + e*(j*c - a*l) + d*(b*l - k*c)) / M;
 
+	// check that the values are ok
 	if (t < 0.0 || gamma > 1.0 || gamma < 0.0 || beta > (1.0 - gamma) || beta < 0.0) {
 		return 9999999;
 	}
@@ -69,6 +71,39 @@ Vec3f triangle::getTextureCoords(Vec3f eye, Vec3f dir)
 	//use these in combination with the known texture surface location of the vertices
 	//to find the texture surface location of the point you are seeing
 
-	Vec3f coords;
+		// from ray tracing chapter of red book
+	Vec3f A = point0, B = point1, C = point2;
+
+	float	a = A[0] - B[0],
+			b = A[1] - B[1],
+			c = A[2] - B[2],
+			d = A[0] - C[0],
+			e = A[1] - C[1],
+			f = A[2] - C[2],
+			g = dir[0],
+			h = dir[1],
+			i = dir[2],
+			j = A[0] - eye[0],
+			k = A[1] - eye[1],
+			l = A[2] - eye[2];
+
+	// cramers rule
+	float M = a*(e*i - h*f) + b*(g*f - d*i) + c*(d*h - e*g);
+	float beta =
+		(j*(e*i - h*f) + k*(g*f - d*i) + l*(d*h - e*g)) / M;
+	float gamma =
+		(i*(a*k - j*b) + h*(j*c - a*l) + g*(b*l - k*c))/M;
+
+	float	ua = float(texX0),
+			ub = float(texX1),
+			uc = float(texX2),
+			va = float(texY0),
+			vb = float(texY1),
+			vc = float(texY2);
+
+	float u = ua + beta * (ub - ua) + gamma * (uc - ua);
+	float v = va + beta * (vb - va) + gamma * (vc - va);
+
+	Vec3f coords = Vec3f(u, v, 0);
 	return coords;
 }
