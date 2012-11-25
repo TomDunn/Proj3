@@ -45,7 +45,6 @@ float triangle::testIntersection(Vec3f eye, Vec3f dir)
 		return 9999999;
 	}
 	return t;
-	//return 9999999;
 }
 
 Vec3f triangle::getNormal(Vec3f eye, Vec3f dir)
