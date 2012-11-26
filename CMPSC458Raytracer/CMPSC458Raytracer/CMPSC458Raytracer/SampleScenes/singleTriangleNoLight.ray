@@ -37,9 +37,9 @@ Materials {
 
 Group {
 	Triangle {
-		vertex0 10 5 5
-		vertex1 5 0 -5
-		vertex2 10 -5 5
+		vertex0 20 5 5
+		vertex1 15 0 -5
+		vertex2 20 -5 5
 		tex_xy_0 1 0
 		tex_xy_1 0 0
 		tex_xy_2 0 1

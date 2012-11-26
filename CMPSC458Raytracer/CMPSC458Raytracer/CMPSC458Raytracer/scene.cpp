@@ -50,11 +50,12 @@ Vec3f scene::rayTrace(Vec3f eye, Vec3f dir, int recurseDepth)
 	}
 
 	// add ambient light/color to our answer
-	answer += ambLight * (myMaterials.at(matIndex).shininess / 100.0f);
+	answer += multiplyColorVectors(ambLight, myMaterials.at(matIndex).diffuseCol);
 
 	// set point slightly above the actual surface, prevents
 	// issues with that point intersecting itself
-	Vec3f point = eye + (dir * dist) + (normal * .0001);
+	Vec3f point = eye + (dir * dist) + (normal * .00001);
+	Vec3f real_point = eye + (dir * dist);
 
 	// get the diffuse color of our material
 	Vec3f diffuseColor = myMaterials.at(matIndex).diffuseCol;
@@ -63,7 +64,7 @@ Vec3f scene::rayTrace(Vec3f eye, Vec3f dir, int recurseDepth)
 	for (int iter = 0; iter < myLights.size(); iter++) {
 
 		Vec3f lightPos = myLights.at(iter).position;
-		Vec3f direction= lightPos - point;
+		Vec3f direction= lightPos - real_point;
 
 		direction.Normalize();
 		float distance = myObjGroup->testIntersections(point, direction);
@@ -73,25 +74,25 @@ Vec3f scene::rayTrace(Vec3f eye, Vec3f dir, int recurseDepth)
 			Vec3f color = multiplyColorVectors(diffuseColor, myLights.at(iter).color);
 			float nl    = direction.Dot3(normal);
 
-			if (nl < 0.0) {
-				nl = 0.0;
+			if (nl < 0.0f) {
+				nl = 0.0f;
 			}
 
 			answer += (color * nl);
 
 			// now do the specular
-			Vec3f h		= (dir + direction) *  (1.0 /(dir + direction).Length());
+			Vec3f backDir = dir * -1.0f;
+			Vec3f h		= (backDir + direction);
+			h.Normalize();
 			Vec3f Cp	=  myMaterials.at(matIndex).specularCol;
 			float nh	= normal.Dot3(h);
-			nh			= pow(nh, 32.0f);
-
-			if (nh < 0.0) {
+			//if (nh > .8) { answer.Set(0.0f,0.0f,0.0f); }
+			if (nh < 0.0f) {
 				nh = 0.0f;
 			}
-
+			nh			= pow(nh, 50.0f);
+			
 			answer		+= (multiplyColorVectors(myLights.at(iter).color, Cp) * nh);
-		} else {
-			//cout << distance << endl;
 		}
 	}
 	//if the light can see the surface point,
@@ -121,21 +122,7 @@ Vec3f scene::rayTrace(Vec3f eye, Vec3f dir, int recurseDepth)
 
 	//multiply whatever color we have found by the texture color
 
-	// TODO: uncomment the following line
 	answer=multiplyColorVectors(answer,textureColor);
-
-	// clamping
-	//if (answer[0] > 1.0) {
-	//	answer.Set(1.0, answer[1], answer[2]);
-	//}
-
-	//if (answer[1] > 1.0) {
-	//	answer.Set(answer[0], 1.0, answer[2]);
-	//}
-
-	//if (answer[2] > 1.0) {
-	//	answer.Set(answer[0], answer[1], 1.0);
-	//}
 	return answer;
 }
 
