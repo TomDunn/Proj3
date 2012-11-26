@@ -60,6 +60,7 @@ Vec3f triangle::getNormal(Vec3f eye, Vec3f dir)
 	//(this can be important for refraction to know whether you are entering or leaving a material)
 	Vec3f normal;
 	Vec3f::Cross3(normal,bary1,bary2);
+	//Vec3f::Cross3(normal, bary2, bary1);
 	normal.Normalize();
 
 	return normal;
