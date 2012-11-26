@@ -54,7 +54,7 @@ Vec3f scene::rayTrace(Vec3f eye, Vec3f dir, int recurseDepth)
 
 	// set point slightly above the actual surface, prevents
 	// issues with that point intersecting itself
-	Vec3f point = eye + (dir * dist) + (normal * .00001);
+	Vec3f point = eye + (dir * dist) + (normal * .0001);
 	Vec3f real_point = eye + (dir * dist);
 
 	// get the diffuse color of our material
@@ -81,18 +81,22 @@ Vec3f scene::rayTrace(Vec3f eye, Vec3f dir, int recurseDepth)
 			answer += (color * nl);
 
 			// now do the specular
+			// we need vector that goes from point to eye
 			Vec3f backDir = dir * -1.0f;
+
 			Vec3f h		= (backDir + direction);
 			h.Normalize();
+
 			Vec3f Cp	=  myMaterials.at(matIndex).specularCol;
+			float p		= myMaterials.at(matIndex).shininess;
 			float nh	= normal.Dot3(h);
-			//if (nh > .8) { answer.Set(0.0f,0.0f,0.0f); }
+
 			if (nh < 0.0f) {
 				nh = 0.0f;
 			}
-			nh			= pow(nh, 50.0f);
-			
-			answer		+= (multiplyColorVectors(myLights.at(iter).color, Cp) * nh);
+
+			nh			= pow(nh, p);
+			answer		+= multiplyColorVectors(myLights.at(iter).color, Cp) * nh;
 		}
 	}
 	//if the light can see the surface point,
@@ -101,6 +105,13 @@ Vec3f scene::rayTrace(Vec3f eye, Vec3f dir, int recurseDepth)
 
 	//add the diffuse light times the accumulated diffuse light to our answer
 
+	if (recurseDepth < 3) {
+		Vec3f e = dir * -1.0f; e.Normalize();
+		Vec3f r = dir + normal * 2.0f * e.Dot3(normal); r.Normalize();
+
+		Vec3f bounced = rayTrace(point, r, recurseDepth + 1);
+		answer += (multiplyColorVectors(bounced, myMaterials.at(matIndex).reflectiveCol));
+	}
 	//put a limit on the depth of recursion
 	//if (recurseDepth<3)
 	//{
@@ -109,7 +120,6 @@ Vec3f scene::rayTrace(Vec3f eye, Vec3f dir, int recurseDepth)
 		//add the color seen times the reflective color
 
 		
-
 		//if going into material (dot prod of dir and normal is negative), bend toward normal
 			//find entry angle using inverse cos of dot product of dir and -normal
 			//multiply entry angle by index of refraction to get exit angle
@@ -121,7 +131,6 @@ Vec3f scene::rayTrace(Vec3f eye, Vec3f dir, int recurseDepth)
 	//}
 
 	//multiply whatever color we have found by the texture color
-
 	answer=multiplyColorVectors(answer,textureColor);
 	return answer;
 }
