@@ -25,13 +25,11 @@ float sphere::testIntersection(Vec3f eye, Vec3f dir)
 		float tMinus	= (-B/2.0 - sqrt(pow(B/2.0, 2.0) - A * C)) / A;
 		float tPlus		= (-B/2.0 + sqrt(pow(B/2.0, 2.0) - A * C)) / A;
 
-		if (tMinus > 0.0 && tPlus > 0.0) {
+		if (tMinus > 0.005 && tPlus > 0.005) {
 			t = min(tMinus, tPlus);
-		} else if (tMinus > 0.0 || tPlus > 0.0) {
+		} else if (tMinus > 0.005 || tPlus > 0.005) {
 			t = max(tMinus, tPlus);
-		} else {
-			t = 9999999;
-		}
+		} 
 	}
 
 	return t;

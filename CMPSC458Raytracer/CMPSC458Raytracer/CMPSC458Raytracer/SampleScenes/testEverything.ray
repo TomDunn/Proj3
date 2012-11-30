@@ -107,21 +107,21 @@ Group {
 		materialIndex 1
 	}
 	Triangle {
-		vertex0 11 -5 5
+		vertex0 11 -5 -5
 		vertex1 11 5 -5
-		vertex2 11 -5 -5
-		tex_xy_0 0 1
+		vertex2 11 -5 5
+		tex_xy_0 1 1
 		tex_xy_1 1 0
-		tex_xy_2 1 1
+		tex_xy_2 0 1
 		materialIndex 2
 	}
 	Triangle {
-		vertex0 11 5 -5
+		vertex0 11 5 5
 		vertex1 11 -5 5
-		vertex2 11 5 5
-		tex_xy_0 1 0
+		vertex2 11 5 -5
+		tex_xy_0 0 0
 		tex_xy_1 0 1
-		tex_xy_2 0 0
+		tex_xy_2 1 0
 		materialIndex 2
 	}
 

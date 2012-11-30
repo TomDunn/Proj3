@@ -43,7 +43,7 @@ float triangle::testIntersection(Vec3f eye, Vec3f dir)
 	float t = -(f*(a*k - j*b) + e*(j*c - a*l) + d*(b*l - k*c)) / M;
 
 	// check that the values are ok
-	if (t < 0.0 || gamma > 1.0 || gamma < 0.0 || beta > (1.0 - gamma) || beta < 0.0) {
+	if (t < 0.0 || gamma > 1.0 || gamma < 0.0 || beta > (1.0 - gamma) || beta < 0.0 || t < .0005) {
 		return 9999999;
 	}
 	return t;

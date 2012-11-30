@@ -64,19 +64,15 @@ Vec3f scene::rayTrace(Vec3f eye, Vec3f dir, int recurseDepth)
 	for (int iter = 0; iter < myLights.size(); iter++) {
 
 		Vec3f lightPos = myLights.at(iter).position;
-		Vec3f direction= lightPos - real_point;
+		Vec3f direction= lightPos - point;
 
 		direction.Normalize();
 		float distance = myObjGroup->testIntersections(point, direction);
 
 		// if nothing between point and light
-		if (distance == 9999999 || distance < 0.00005f) {
+		if (distance == 9999999) {
 			Vec3f color = multiplyColorVectors(diffuseColor, myLights.at(iter).color);
-			float nl    = direction.Dot3(normal);
-
-			if (nl < 0.0f) {
-				nl = 0.0f;
-			}
+			float nl    = abs(direction.Dot3(normal));
 
 			answer += (color * nl);
 
@@ -89,11 +85,7 @@ Vec3f scene::rayTrace(Vec3f eye, Vec3f dir, int recurseDepth)
 
 			Vec3f Cp	=  myMaterials.at(matIndex).specularCol;
 			float p		= myMaterials.at(matIndex).shininess;
-			float nh	= normal.Dot3(h);
-
-			if (nh < 0.0f) {
-				nh = 0.0f;
-			}
+			float nh	= abs(normal.Dot3(h));
 
 			nh			= pow(nh, p);
 			answer		+= multiplyColorVectors(myLights.at(iter).color, Cp) * nh;
@@ -111,6 +103,29 @@ Vec3f scene::rayTrace(Vec3f eye, Vec3f dir, int recurseDepth)
 
 		Vec3f bounced = rayTrace(point, r, recurseDepth + 1);
 		answer += (multiplyColorVectors(bounced, myMaterials.at(matIndex).reflectiveCol));
+
+		// refraction
+		Vec3f transparentColor	= myMaterials.at(matIndex).transparentCol;
+		float transpar			= transparentColor.Dot3(transparentColor);
+
+		if (transpar > 0.0f) {
+			float exitAngle, entryAngle;
+
+			if (dir.Dot3(normal) < 0.0f) {
+				entryAngle = acos(dir.Dot3(normal * -1.0f));
+				exitAngle = entryAngle * myMaterials.at(matIndex).refractionIndex;
+			} else {
+				entryAngle = acos(dir.Dot3(normal));
+				exitAngle = entryAngle / myMaterials.at(matIndex).refractionIndex;
+			}
+
+			Vec3f b = (dir + (normal * cos(entryAngle))) * (1.0f /sin(entryAngle));
+			b.Normalize();
+			Vec3f refracted = (b * sin(exitAngle)) - (normal * cos(exitAngle));
+			refracted.Normalize();
+
+			answer += multiplyColorVectors(rayTrace(real_point, refracted, recurseDepth + 1), myMaterials.at(matIndex).transparentCol);
+		}
 	}
 	//put a limit on the depth of recursion
 	//if (recurseDepth<3)
